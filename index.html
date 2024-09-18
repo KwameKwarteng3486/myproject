@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Location Map</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCT4Uz3kQWS5gT7XszCPr-YIOVMt3fkdzs"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            max-width: 900px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .btn:active {
+            background-color: #1e7e34;
+        }
+
+        @media (max-width: 768px) {
+            #map {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>User Location Map</h1>
+    <div id="map"></div>
+    <div class="btn-container">
+        <a href="index.html" class="btn">Refresh Location</a>
+    </div>
+
+    <script>
+        function initMap() {
+            // Try to get the user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLat = position.coords.latitude;
+                    var userLng = position.coords.longitude;
+                    
+                    // Display map centered on user's location
+                    var userLocation = { lat: userLat, lng: userLng };
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 15,
+                        center: userLocation
+                    });
+                    
+                    // Place a marker at user's location
+                    new google.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: 'Your Location'
+                    });
+                    
+                    // Send the user's location to the server via AJAX
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "save_location.php", true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xhr.send("lat=" + userLat + "&lng=" + userLng);
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+        
+        window.onload = initMap;
+    </script>
+</body>
+</html>
